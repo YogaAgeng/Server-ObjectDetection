@@ -4,5 +4,4 @@ package-lock.json
 build
 .env
 /public/uploads
-Seeders
 .vercel

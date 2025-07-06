@@ -27,3 +27,5 @@ module.exports = {
     await queryInterface.bulkDelete('branch', null, {});
   }
 };
+
+

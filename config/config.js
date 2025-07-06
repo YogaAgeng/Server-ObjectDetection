@@ -1,35 +1,34 @@
 require('dotenv').config();
 
-const {
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_HOST,
-  DB_DATABASE,
-  DB_DIALECT,
-  DB_PORT,
-} = process.env;
+const logging_enable = process.env.DB_LOGGING.toLowerCase() === 'true';
+const db_port = parseInt(process.env.DB_PORT);
 
 module.exports = {
-  "development": {
-    "username": DB_USERNAME,
-    "password": DB_PASSWORD,
-    "database": DB_DATABASE,
-    "host": DB_HOST,
-    "port": DB_PORT,
-    "dialect": DB_DIALECT
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    port: db_port,
+    logging: logging_enable,
   },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+  test: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    port: db_port,
+    logging: logging_enable,
   },
-  "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  }
-}
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    port: db_port,
+    logging: logging_enable,
+  },
+};

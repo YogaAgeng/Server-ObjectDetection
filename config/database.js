@@ -1,26 +1,27 @@
+require('dotenv').config();
 const { Sequelize } = require('sequelize');
-require('dotenv').config(); 
-const env = process.env.NODE_ENV || 'development'; 
 
-const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+const logging_enable = (process.env.DB_LOGGING || 'false').toLowerCase() === 'true';
+const db_port = parseInt(process.env.DB_PORT);
+const db_dialect = process.env.DB_DIALECT || 'mysql';
+
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
   host: process.env.DB_HOST,
-  dialect: process.env.DB_DIALECT,
-  port: process.env.DB_PORT,
-  // dialectOptions: {
-  //   ssl: {
-  //     require: true,
-  //     rejectUnauthorized: false
-  //   },
-  //   connectTimeout: 20000,
-  // },
+  dialect: db_dialect,
+  port: db_port,
+  logging: logging_enable,
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 120000,
+    idle: 60000,
+  },
+  dialectOptions: {
+    connectTimeout: 120000
+  },
+  retry: {
+    max: 3
+  }
 });
-
-// const sequelize = new Sequelize(process.env.DATABASE_URL, {
-//   dialectOptions: {
-//     ssl: { // <1>
-//       rejectUnauthorized: true,
-//     }
-//   },
-// })
 
 module.exports = sequelize;

@@ -1,4 +1,4 @@
-const formatMessage = require("../../utils/formatMessage");
+const formatMessage = require("../utils/formatMessage");
 const Sensor = require("../models/Sensor");
 // const io = require("../../index");
 

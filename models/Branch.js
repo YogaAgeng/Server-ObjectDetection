@@ -1,17 +1,8 @@
-'use strict';
 
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../config/database');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-
-class Branch extends Model {
-    static associate(models) {
-        Branch.hasMany(models.User, { foreignKey: 'branch_id' });
-        Branch.hasMany(models.Sensor, { foreignKey: 'branch_id' });
-    }
-};
-
-Branch.init({
+const Branch = sequelize.define('branch', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -47,9 +38,14 @@ Branch.init({
         type: DataTypes.DATE
     }
 }, {
-    sequelize,
-    modelName: 'Branch',
+    paranoid: true,
+    timestamps: true,
     tableName: 'branch'
 });
+
+Branch.associate = (models) => {
+    Branch.hasMany(models.History, { foreignKey: 'branch_id', as: 'histories' });
+    Branch.hasMany(models.Sensor, { foreignKey: 'branch_id', as: 'sensors' });
+};
 
 module.exports = Branch;

@@ -10,7 +10,7 @@ const {
   validateCondition,
   validateRole,
   errorResponse,
-} = require("../../helper/responseUser");
+} = require("../helper/responseUser");
 
 const jwtSecret = process.env.JWT_SECRET;
 

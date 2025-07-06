@@ -10,7 +10,7 @@ const routes = require('./routes');
 class App {
   constructor() {
     this.app = express();
-    this.port = parseInt(process.env.APP_PORT, 10) || 3002;
+    this.port = parseInt(process.env.APP_PORT, 10) || 3003;
 
     this.configureMiddleware();
     this.configureRoutes();

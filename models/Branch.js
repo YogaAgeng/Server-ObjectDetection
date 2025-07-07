@@ -33,7 +33,7 @@ const Branch = sequelize.define('branch', {
         allowNull: false,
         type: DataTypes.DATE
     },
-    deleteAt: {
+    deletedAt: {
         allowNull: true,
         type: DataTypes.DATE
     }

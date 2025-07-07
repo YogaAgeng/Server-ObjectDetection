@@ -45,7 +45,7 @@ const History = sequelize.define('history', {
     allowNull: false,
     type: DataTypes.DATE
   },
-  deleteAt: {
+  deletedAt: {
     allowNull: true,
     type: DataTypes.DATE
   }

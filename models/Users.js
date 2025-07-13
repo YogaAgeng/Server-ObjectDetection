@@ -50,6 +50,7 @@ const User = sequelize.define('users', {
 User.associate = (models) => {
   User.belongsTo(models.Branch, { foreignKey: 'branch_id', as: 'branch' });
   User.hasMany(models.History, { foreignKey: 'user_id', as: 'history' });
+  User.hasMany(models.DeviceToken, { foreignKey: 'user_id', as: 'device_tokens' });
 };
 
 module.exports = User;

@@ -5,3 +5,7 @@ build
 .env
 /public/uploads
 .vercel
+
+# .gitignore
+alarmfirebasekey.json
+objectdetectionflutter.json

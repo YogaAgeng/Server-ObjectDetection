@@ -85,7 +85,7 @@ const createHistory = async (req, res, photo_url) => {
             photo_url,
             user_id,
             branch_id,
-            isEmergency,
+            isEmergency : true,
         });
         res.json(dataHistory);
     } catch (error) {

@@ -36,7 +36,6 @@ router.post(
       req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename;
     
     createHistory(req, res, finalImageURL);
-    
   }
 );
 router.get("/api/historys/token", protect, getHistoryByToken);

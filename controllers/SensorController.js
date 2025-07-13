@@ -1,6 +1,11 @@
 const formatMessage = require("../utils/formatMessage");
 const Sensor = require("../models/Sensor");
+const User = require("../models/Users");
+const DeviceToken = require("../models/DeviceTokens");
+const axios = require("axios");
+
 // const io = require("../../index");
+const { JWT } = require('google-auth-library');
 
 const express = require("express");
 const { Server } = require("socket.io");
@@ -8,6 +13,126 @@ const { Server } = require("socket.io");
 const app = express();
 const server = require("http").Server(app);
 const io = new Server(server);
+
+const serviceAccount = require('../objectdetectionflutter.json');
+
+async function getAccessToken() {
+  const client = new JWT({
+    email: serviceAccount.client_email,
+    key: serviceAccount.private_key,
+    scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
+  });
+
+  const { access_token } = await client.authorize();
+  return access_token;
+}
+
+// Fungsi kirim push notifikasi via FCM
+async function sendPushNotificationFCM({ token, sensor_id, branch_id }) {
+  const accessToken = await getAccessToken();
+
+  const payload = {
+    message: {
+      token, // Token device user
+      android: { priority: 'high' },
+      data: {
+        type: 'alarm',
+        branch_id: String(branch_id),
+        sensor_id: String(sensor_id),
+        message: 'Sensor mendeteksi gerakan!',
+      },
+    },
+  };
+
+  const projectId = serviceAccount.project_id;
+  const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
+  const response = await axios.post(fcmUrl, payload, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.data;
+}
+
+const sensorActive = async (req, res) => {
+  try {
+    const { sensor_id, isDetected } = req.body;
+
+
+    if (!sensor_id || typeof isDetected !== 'boolean') {
+      return res.status(400).json({ message: 'Invalid input' });
+    }
+
+    const sensor = await Sensor.findByPk(sensor_id);
+
+    if (!sensor) {
+      return res.status(404).json({ message: 'Sensor not found' });
+    }
+
+    const branch_id = sensor.branch_id;
+
+    if (isDetected) {
+
+
+      const users = await User.findAll({
+        where: { branch_id },
+        include: [{
+          model: DeviceToken,
+          as: 'device_tokens',
+        }],
+      });
+
+      // Langkah 2: Ambil semua device_token unik dari user-user tersebut
+      const allTokens = users.flatMap(user => user.device_tokens.map(dt => dt.device_token));
+      const uniqueTokens = [...new Set(allTokens)];
+
+      if (uniqueTokens.length === 0) {
+        return res.status(200).json({ message: 'Tidak ada device token untuk branch ini.' });
+      }
+
+      // Langkah 3: Kirim notifikasi ke setiap token
+      const results = [];
+      for (const token of uniqueTokens) {
+        try {
+          const result = await sendPushNotificationFCM({
+            token,
+            sensor_id,
+            branch_id,
+          });
+          results.push({ token, status: 'sent', response: result });
+        } catch (err) {
+          results.push({
+            token,
+            status: 'failed',
+            error: err.response?.data || err.message,
+          });
+        }
+      }
+      console.log('FCM Results:', results);
+      return res.status(200).json({
+        message: 'FCM proses selesai',
+        total_tokens: uniqueTokens.length,
+        results,
+      });
+    } else {
+      console.log('Sensor tidak mendeteksi, tidak kirim FCM.');
+      return res.status(200).json({
+        message: 'Sensor tidak mendeteksi, tidak kirim FCM.',
+      });
+    }
+  } catch (error) {
+    console.error('Sensor FCM Error:', error);
+    return res.status(500).json({
+      message: 'Gagal memproses data sensor',
+      error: error.message,
+    });
+  }
+};
+
+
 
 const getSensor = async (req, res) => {
   try {
@@ -193,13 +318,6 @@ const updateSensorRaspberry = async (req, res) => {
       message: "Sensor updated successfully"
     });
     console.log(dataSensor);
-    io.on('connection', (socket) => {
-      //join with name and branch_id
-      socket.on('joinBranch', ({ branch_id }) => {
-        socket.join(branch_id);
-        socket.broadcast.to(branch_id).emit('dataSensor', formatMessage(dataSensor));
-      });
-    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -259,6 +377,7 @@ module.exports = {
   updateSensor,
   updateSensorRaspberry,
   deleteSensor,
-  getSensorByBranchId
+  getSensorByBranchId,
+  sensorActive
   // updateAllSensorTimes,
 };

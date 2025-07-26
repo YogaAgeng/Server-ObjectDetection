@@ -44,6 +44,8 @@ async function sendPushNotificationFCM({ token, sensor_id, branch_id }) {
     },
   };
 
+  console.log("PAYLOAD", payload)
+
   const projectId = serviceAccount.project_id;
   const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
 

@@ -182,6 +182,7 @@ const getSensors = async (req, res) => {
 
 const getSensorByToken = async (req, res) => {
   try {
+    console.log("MASUKK")
     const loggedInAdminBranchId = req.user.branch_id;
     const sensor = await Sensor.findAll({
       where: { branch_id: loggedInAdminBranchId },

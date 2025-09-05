@@ -44,13 +44,8 @@ const Sensor = sequelize.define('sensor', {
   updatedAt: {
     allowNull: false,
     type: DataTypes.DATE
-  },
-  deletedAt: {
-    allowNull: true,
-    type: DataTypes.DATE
   }
 }, {
-  paranoid: true,
   timestamps: true,
   tableName: 'sensor'
 });

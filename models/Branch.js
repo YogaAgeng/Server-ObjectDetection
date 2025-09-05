@@ -33,12 +33,7 @@ const Branch = sequelize.define('branch', {
         allowNull: false,
         type: DataTypes.DATE
     },
-    deletedAt: {
-        allowNull: true,
-        type: DataTypes.DATE
-    }
 }, {
-    paranoid: true,
     timestamps: true,
     tableName: 'branch'
 });

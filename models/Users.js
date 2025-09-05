@@ -36,13 +36,8 @@ const User = sequelize.define('users', {
   updatedAt: {
     allowNull: false,
     type: DataTypes.DATE
-  },
-  deletedAt: {
-    allowNull: true,
-    type: DataTypes.DATE
   }
 }, {
-  paranoid: true,
   timestamps: true,
   tableName: 'users'
 });

@@ -1,64 +1,30 @@
-
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const History = sequelize.define('history', {
+const History = sequelize.define('History', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
-    allowNull: false
+    autoIncrement: true
   },
   sensor_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: false
   },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+  event_type: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  status: {
+    type: DataTypes.STRING
   },
   description: {
-    type: DataTypes.STRING,
-    allowNull: true
+    type: DataTypes.TEXT
   },
-  isEmergency: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
-  },
-  date: {
+  created_at: {
     type: DataTypes.DATE,
-    allowNull: false
-  },
-  photo_url: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  branch_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  createdAt: {
-    allowNull: false,
-    type: DataTypes.DATE
-  },
-  updatedAt: {
-    allowNull: false,
-    type: DataTypes.DATE
-  },
-  deletedAt: {
-    allowNull: true,
-    type: DataTypes.DATE
+    defaultValue: DataTypes.NOW
   }
-}, {
-  paranoid: true,
-  timestamps: true,
-  tableName: 'history'
 });
-
-History.associate = (models) => {
-  History.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-  History.belongsTo(models.Branch, { foreignKey: 'branch_id', as: 'branch' });
-  History.belongsTo(models.Sensor, { foreignKey: 'sensor_id', as: 'sensor' });
-};
 
 module.exports = History;
